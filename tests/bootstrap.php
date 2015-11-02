@@ -3,7 +3,7 @@
 // Load Composer autoload.
 require __DIR__ . '/../vendor/autoload.php';
 
-$papi_path = '/tmp/wordpress/src/wp-content/plugins/papi';
+$papi_path = '/tmp/wordpress/src/wp-content/plugins/papi/papi-loader.php';
 
 if ( file_exists( __DIR__ . '/../../papi/papi-loader.php' ) ) {
 	$papi_path = __DIR__ . '/../../papi/papi-loader.php';
