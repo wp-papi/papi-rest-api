@@ -1,0 +1,43 @@
+{
+  "name": "wp-papi/papi-rest-api",
+  "type": "wordpress-plugin",
+  "license": "MIT",
+  "description": "Add-on for the WordPress REST API",
+  "homepage": "https://wp-papi.github.io",
+  "authors": [
+    {
+      "name": "Fredrik Forsmo",
+      "email": "fredrik.forsmo@gmail.com",
+      "homepage": "https://github.com/frozzare"
+    }
+  ],
+  "keywords": [
+    "wordpress",
+    "custom fields",
+    "page type",
+    "page"
+  ],
+  "support": {
+    "issues": "https://github.com/wp-papi/papi-rest-api/issues"
+  },
+  "require": {
+    "php": ">=5.4.7",
+    "composer/installers": "~1.0"
+  },
+  "require-dev": {
+    "frozzare/wp-test-suite": "~1.0",
+    "wp-coding-standards/wpcs": "dev-develop",
+    "sebastian/phpcpd": "~2.0@dev"
+  },
+  "scripts": {
+    "post-install-cmd": "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs",
+    "post-update-cmd" : "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+  },
+  "extra": {
+      "branch-alias": {
+          "dev-master": "2.5-dev"
+      }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
