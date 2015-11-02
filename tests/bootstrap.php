@@ -18,4 +18,15 @@ WP_Test_Suite::load_plugins( [
 ] );
 
 // Run the WordPress test suite.
-WP_Test_Suite::run();
+WP_Test_Suite::run( function () {
+
+	/**
+	 * Register Papi directory.
+	 *
+	 * @return string
+	 */
+	add_filter( 'papi/settings/directories', function () {
+		return __DIR__ . '/fixtures/option-types';
+	} );
+
+} );
