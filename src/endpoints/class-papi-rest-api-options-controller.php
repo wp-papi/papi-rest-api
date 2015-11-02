@@ -10,22 +10,13 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route( $this->namespace, '/options', [
-			'methods'  => [
-				'GET'
-			],
+			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [$this, 'callback']
 		] );
 
 		register_rest_route( $this->namespace, '/options/(?P<option>.+)', [
-			'methods'  => [
-				'GET'
-			],
-			'callback' => [$this, 'callback'],
-			'args'     => [
-				'option' => [
-					'validate_callback' => 'is_string'
-				]
-			]
+			'methods'  => WP_REST_Server::READABLE,
+			'callback' => [$this, 'callback']
 		] );
 	}
 
