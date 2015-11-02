@@ -16,7 +16,7 @@ class Papi_REST_API_Test extends WP_UnitTestCase {
 		$this->assertGreaterThan( 0, has_action( 'rest_api_init', [$this, 'register_routes'] ) );
 	}
 
-	public function test_papi() {
+	public function test_if_papi_exists() {
 		$this->assertTrue( function_exists( 'papi' ) );
 	}
 }
