@@ -4,7 +4,7 @@ class Papi_REST_API_Test extends WP_UnitTestCase {
 
 	public function setUp() {
 		parent::setUp();
-		$this->api = new Papi_REST_API;
+		$this->api = Papi_REST_API::instance();
 	}
 
 	public function tearDown() {
