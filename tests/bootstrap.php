@@ -3,8 +3,10 @@
 // Load Composer autoload.
 require __DIR__ . '/../vendor/autoload.php';
 
+// Travis path to Papi plugin.
 $papi_path = '/tmp/wordpress/src/wp-content/plugins/papi/papi-loader.php';
 
+// On development environment, use another path to Papi plugin.
 if ( file_exists( __DIR__ . '/../../papi/papi-loader.php' ) ) {
 	$papi_path = __DIR__ . '/../../papi/papi-loader.php';
 }
