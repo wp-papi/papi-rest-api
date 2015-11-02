@@ -10,10 +10,7 @@ install:
 
 before_script:
   - bash vendor/frozzare/wp-test-suite/bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1 $WP_VERSION
-  - git clone https://github.com/wp-papi/papi.git /tmp/wordpress/src/wp-content/plugins/papi
-  - cd /tmp/wordpress/src/wp-content/plugins/papi
-  - git checkout 2.x
-  - git pull
+  - git clone --branch=2.x https://github.com/wp-papi/papi.git /tmp/wordpress/src/wp-content/plugins/papi
 
 script:
   - vendor/bin/phpunit --coverage-clover clover.xml
