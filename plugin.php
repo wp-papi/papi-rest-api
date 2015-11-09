@@ -17,6 +17,6 @@ require_once __DIR__ . '/src/class-papi-rest-api.php';
 /**
  * Load Papi REST API plugin.
  */
-add_action( 'papi/include', function () {
+add_action( 'papi/loaded', function () {
 	Papi_REST_API::instance();
 } );
