@@ -50,7 +50,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			}
 
 			foreach ( $option_type->get_boxes() as $box ) {
-				foreach ( $box[1] as $property ) {
+				foreach ( $box->properties as $property ) {
 					$slugs[] = $property->get_slug( true );
 				}
 			}
