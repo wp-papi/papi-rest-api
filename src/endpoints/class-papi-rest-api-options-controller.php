@@ -41,8 +41,10 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * @return array
 	 */
 	private function get_options_slugs() {
-		$option_types = papi_get_all_page_types( false, null, true );
 		$slugs        = [];
+		$option_types = papi_get_all_content_types( [
+			'type' => 'option'
+		] );
 
 		foreach ( $option_types as $option_type ) {
 			if ( ! papi_is_option_type( $option_type ) ) {
@@ -50,7 +52,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			}
 
 			foreach ( $option_type->get_boxes() as $box ) {
-				foreach ( $box[1] as $property ) {
+				foreach ( $box->properties as $property ) {
 					$slugs[] = $property->get_slug( true );
 				}
 			}
