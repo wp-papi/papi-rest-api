@@ -53,11 +53,37 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 
 			foreach ( $option_type->get_boxes() as $box ) {
 				foreach ( $box->properties as $property ) {
-					$slugs[] = $property->get_slug( true );
+					$slugs[] = $this->create_property_item( $property );
 				}
 			}
 		}
 
 		return $slugs;
+	}
+
+	/**
+	 * Create property item that is returned to the REST API.
+	 *
+	 * @param  Papi_Core_Property $property
+	 *
+	 * @return object
+	 */
+	private function create_property_item( Papi_Core_Property $property ) {
+		$item = [
+			'title' => $property->title,
+			'slug'  => $property->get_slug( true ),
+			'type'  => $property->type
+		];
+
+		/**
+		 * Modify the property item that is returned to the REST API.
+		 *
+		 * @param  array $item
+		 */
+		if ( $output = apply_filters( 'papi/rest/property_item', $item ) ) {
+			$item = is_array( $output ) || is_object( $output ) ? $output : $item;
+		}
+
+		return (object) $item;
 	}
 }
