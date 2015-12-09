@@ -29,9 +29,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( [
-			'name'
-		], $data );
+		$this->assertEquals( ['name'], $data );
 	}
 
 	public function test_get_empty_option_value() {
