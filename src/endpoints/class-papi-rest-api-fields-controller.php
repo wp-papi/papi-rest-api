@@ -86,7 +86,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		foreach ( $boxes as $box ) {
 			foreach ( $box->properties as $property ) {
 				if ( papi_is_property( $property ) ) {
-					$properties[] = $this->create_property_item( $property, [
+					$properties[] = $this->create_property_item( $request, $property, [
 						'page_type' => $page_type->get_id()
 					] );
 				}
@@ -132,7 +132,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		// we need to set the post id the property aswell.
 		$property->set_post_id( $request['id'] );
 
-		return $this->create_property_item( $property, [
+		return $this->create_property_item( $request, $property, [
 			'page_type' => $page->get_page_type()->get_id()
 		] );
 	}

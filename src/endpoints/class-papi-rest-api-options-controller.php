@@ -69,31 +69,34 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * @return object
 	 */
 	public function get_option( WP_REST_Request $request ) {
-		return $this->get_option_property( $request['slug'] );
+		return $this->get_option_property( $request );
 	}
 
 	/**
 	 * Get option property.
 	 *
+	 * @param  WP_REST_Request $request
 	 * @param  string $slug
 	 *
 	 * @return object|WP_Error
 	 */
-	protected function get_option_property( $slug ) {
+	protected function get_option_property( WP_REST_Request $request ) {
 		$page     = new Papi_Option_Page();
-		$property = $page->get_property( $slug );
+		$property = $page->get_property( $request['slug'] );
 
 		if ( ! papi_is_property( $property ) ) {
 			return new WP_Error( 'papi_slug_invalid', __( 'Option slug doesn\'t exist', 'papi-rest-api' ) , ['status' => 404] );
 		}
 
-		return $this->create_property_item( $property );
+		return $this->create_property_item( $request, $property, [
+			'option_type' => $page->get_option_type()->get_id()
+		] );
 	}
 
 	/**
 	 * Get option types properties.
 	 *
-	 * @param  \WP_REST_Request $request
+	 * @param  WP_REST_Request $request
 	 *
 	 * @return array
 	 */
@@ -118,8 +121,8 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			foreach ( $option_type->get_boxes() as $box ) {
 				foreach ( $box->properties as $property ) {
 					if ( papi_is_property( $property ) ) {
-						$properties[] = $this->create_property_item( $property, [
-							//'option_type' => $option_type->get_id()
+						$properties[] = $this->create_property_item( $request, $property, [
+							'option_type' => $option_type->get_id()
 						] );
 					}
 				}
@@ -183,7 +186,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function update_option( WP_REST_Request $request ) {
 		if ( papi_update_option( $request['slug'], $request['value'] ) ) {
-			return $this->get_option_property( $request['slug'] );
+			return $this->get_option_property( $request );
 		}
 
 		return new WP_Error( 'papi_update_option_error', __( 'Update option value did not work. The property may not be found', 'papi-rest-api' ), ['status' => 500] );

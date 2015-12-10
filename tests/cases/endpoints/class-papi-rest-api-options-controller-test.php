@@ -165,6 +165,33 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( $expected, $data );
 	}
 
+	public function test_get_option_value_with_fields_query_string() {
+		update_option( 'name', 'Fredrik' );
+		$request = new WP_REST_Request( 'GET', '/papi/v1/options/name' );
+		$request->set_param('fields', 'title,type,sort_order');
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$expected = (object) [
+			'title'      => 'Name',
+			'type'       => 'string',
+			'sort_order' => 1000,
+			'_links'     => [
+				'self' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options/name'
+					]
+				],
+				'collection' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options'
+					]
+				]
+			]
+		];
+
+		$this->assertEquals( $expected, $data );
+	}
+
 	public function test_update_option_value_access_denied() {
 		update_option( 'name', 'Fredrik' );
 		$request = new WP_REST_Request( 'POST', '/papi/v1/options/name' );

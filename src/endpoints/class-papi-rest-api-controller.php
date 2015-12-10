@@ -27,27 +27,53 @@ abstract class Papi_REST_API_Controller {
 	/**
 	 * Create property item that is returned to the REST API.
 	 *
+	 * @param  WP_REST_Request    $request
 	 * @param  Papi_Core_Property $property
-	 * @param  array $extra
+	 * @param  array              $extra
 	 *
 	 * @return object
 	 */
-	protected function create_property_item( Papi_Core_Property $property, array $extra = [] ) {
-		$func = $this->route === 'options' ? 'papi_get_option' : 'papi_get_field';
+	protected function create_property_item( WP_REST_Request $request, Papi_Core_Property $property, array $extra = [] ) {
+		$item   = [];
+		$fields = ['slug', 'title', 'type', 'value'];
 
-		$item = [
-			'title' => $property->title,
-			'slug'  => $property->get_slug( true ),
-			'type'  => $property->type
-		];
-
-		if ( $this->route === 'options' ) {
-			$item['value'] = papi_get_option( $property->get_slug( true ), null );
-		} else {
-			$item['value'] = papi_get_field( $property->get_post_id(), $property->get_slug( true ), null );
+		if ( ! empty ( $request['fields'] ) && is_string( $request['fields'] ) ) {
+			$fields = explode( ',', trim( $request['fields'] ) );
 		}
 
-		$item = array_merge( $item, $extra );
+		foreach ( $fields as $field ) {
+			if ( $field === 'slug' ) {
+				$item[$field] = $property->get_slug( true );
+
+				continue;
+			}
+
+			if ( $field === 'value' ) {
+				if ( $this->route === 'options' ) {
+					$item[$field] = papi_get_option( $property->get_slug( true ), null );
+				} else {
+					$item[$field] = papi_get_field( $property->get_post_id(), $property->get_slug( true ), null );
+				}
+
+				continue;
+			}
+
+			$value = $property->$field;
+
+			if ( is_null( $value ) && isset( $extra[$field] ) ) {
+				$value = $extra[$field];
+			}
+
+			if ( is_callable( $value ) ) {
+				continue;
+			}
+
+			if ( is_object( $value ) && get_class( $value ) !== 'stdClass' ) {
+				continue;
+			}
+
+			$item[$field] = $value;
+		}
 
 		/**
 		 * Modify the property item that is returned to the REST API.
@@ -60,21 +86,36 @@ abstract class Papi_REST_API_Controller {
 
 		ksort( $item );
 
-		return $this->prepare_links( (object) $item );
+		// $item = array_merge( $item, $extra );
+
+		return $this->prepare_links( (object)$item, $property->get_slug( true ) );
+	}
+
+	/**
+	 * Prepare fields that should be returned to the client.
+	 *
+	 * @param  WP_REST_Request $request
+	 * @param  string          $item
+	 * @param  array           $extra
+	 *
+	 * @return object
+	 */
+	protected function prepare_fields( WP_REST_Request $request, Papi_Core_Property $property, $item, array $extra = [] ) {
 	}
 
 	/**
 	 * Prepare links for the request.
 	 *
 	 * @param  object $items
+	 * @param  string $slug
 	 *
 	 * @return object
 	 */
-	protected function prepare_links( $items ) {
+	protected function prepare_links( $items, $slug ) {
 		$items->_links = [
 			'self' => [
 				[
-					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->route, $items->slug ) )
+					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->route, $slug ) )
 				]
 			],
 			'collection' => [
