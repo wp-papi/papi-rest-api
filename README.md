@@ -12,15 +12,15 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 Get all option types properties.
 
-`GET /wp-json/papi/v1/options/{option-name}`
+`GET /wp-json/papi/v1/options/{option-slug}`
 
 Get a single option type property.
 
-`PUT /wp-json/papi/v1/options/{option-name}`
+`PUT /wp-json/papi/v1/options/{option-slug}`
 
 Update a single option type property value.
 
-`DELETE /wp-json/papi/v1/options/{option-name}`
+`DELETE /wp-json/papi/v1/options/{option-slug}`
 
 Delete a single option type property value.
 
