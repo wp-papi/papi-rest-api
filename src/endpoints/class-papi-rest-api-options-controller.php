@@ -14,7 +14,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			'callback' => [$this, 'callback']
 		] );
 
-		register_rest_route( $this->namespace, '/options/(?P<option>.+)', [
+		register_rest_route( $this->namespace, '/options/(?P<slug>.+)', [
 			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [$this, 'callback']
 		] );
@@ -24,24 +24,38 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * Handle the options endpoint callback.
 	 *
 	 * @param  \WP_REST_Request $request
-	 */
-	public function callback( WP_REST_Request $request ) {
-		if ( $request['option'] ) {
-			return [
-				'value' => papi_get_option( $request['option'] )
-			];
-		}
-
-		return $this->get_options_slugs();
-	}
-
-	/**
-	 * Get all options slugs.
 	 *
 	 * @return array
 	 */
-	private function get_options_slugs() {
-		$slugs        = [];
+	public function callback( WP_REST_Request $request ) {
+		if ( $request['slug'] ) {
+			return $this->get_option_property( $request['slug'] );
+		}
+
+		return $this->get_options_properties();
+	}
+
+	/**
+	 * Get option property.
+	 *
+	 * @param  string $slug
+	 *
+	 * @return array
+	 */
+	protected function get_option_property( $slug ) {
+		$page     = new Papi_Option_Page();
+		$property = $page->get_property( $slug );
+
+		return $this->create_property_item( $property );
+	}
+
+	/**
+	 * Get all options properties.
+	 *
+	 * @return array
+	 */
+	protected function get_options_properties() {
+		$properties   = [];
 		$option_types = papi_get_all_content_types( [
 			'type' => 'option'
 		] );
@@ -53,12 +67,12 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 
 			foreach ( $option_type->get_boxes() as $box ) {
 				foreach ( $box->properties as $property ) {
-					$slugs[] = $this->create_property_item( $property );
+					$properties[] = $this->create_property_item( $property );
 				}
 			}
 		}
 
-		return $slugs;
+		return $properties;
 	}
 
 	/**
@@ -68,11 +82,12 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 *
 	 * @return object
 	 */
-	private function create_property_item( Papi_Core_Property $property ) {
+	protected function create_property_item( Papi_Core_Property $property ) {
 		$item = [
 			'title' => $property->title,
 			'slug'  => $property->get_slug( true ),
-			'type'  => $property->type
+			'type'  => $property->type,
+			'value' => papi_get_option( $property->get_slug( true ), null )
 		];
 
 		/**
@@ -84,6 +99,30 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			$item = is_array( $output ) || is_object( $output ) ? $output : $item;
 		}
 
-		return (object) $item;
+		return $this->prepare_links( (object) $item );
+	}
+
+	/**
+	 * Prepare links for the request.
+	 *
+	 * @param  object $items
+	 *
+	 * @return object
+	 */
+	protected function prepare_links( $items ) {
+		$items->_links = [
+			'self' => [
+				[
+					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, 'options', $items->slug ) )
+				]
+			],
+			'collection' => [
+				[
+					'href' => rest_url( sprintf( '%s/%s', $this->namespace, 'options' ) )
+				]
+			]
+		];
+
+		return $items;
 	}
 }
