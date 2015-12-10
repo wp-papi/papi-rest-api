@@ -18,11 +18,11 @@ Get a single option type property.
 
 `PUT /wp-json/papi/v1/options/{option-name}`
 
-Update a single option type property.
+Update a single option type property value.
 
 `DELETE /wp-json/papi/v1/options/{option-name}`
 
-Delete a single option type property.
+Delete a single option type property value.
 
 ## Filters
 
