@@ -100,8 +100,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 	}
 
 	public function test_get_missing_option_value() {
-		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
-		$request->set_param( 'slug', 'name_missing' );
+		$request = new WP_REST_Request( 'GET', '/papi/v1/options/missing' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
@@ -114,8 +113,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 	}
 
 	public function test_get_empty_option_value() {
-		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
-		$request->set_param( 'slug', 'name' );
+		$request = new WP_REST_Request( 'GET', '/papi/v1/options/name' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = (object) [
@@ -142,8 +140,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 
 	public function test_get_option_value() {
 		update_option( 'name', 'Fredrik' );
-		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
-		$request->set_param( 'slug', 'name' );
+		$request = new WP_REST_Request( 'GET', '/papi/v1/options/name' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = (object) [
