@@ -47,7 +47,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 		$property = $page->get_property( $slug );
 
 		if ( ! papi_is_property( $property ) ) {
-			return;
+			return new WP_Error( 'papi_slug_invalid', __( 'Option slug doesn\'t exist', 'papi-rest-api' ) , ['status' => 404] );
 		}
 
 		return $this->create_property_item( $property );

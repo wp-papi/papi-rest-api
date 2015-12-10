@@ -50,6 +50,19 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$this->assertEquals( $expected, $data[0] );
 	}
 
+	public function test_get_missing_option_value() {
+		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
+		$request->set_param( 'slug', 'name_missing' );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$expected = [
+			'code'    => 'papi_slug_invalid',
+			'message' => 'Option slug doesn\'t exist',
+			'data'    => ['status' => 404]
+		];
+		$this->assertEquals( $expected, $data );
+	}
+
 	public function test_get_empty_option_value() {
 		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
 		$request->set_param( 'slug', 'name' );
