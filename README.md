@@ -8,6 +8,8 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 ## Endpoints
 
+### Fields
+
 `GET /wp-json/papi/v1/fields/{id}`
 
 Get all page types properties on a post.
@@ -23,6 +25,8 @@ Update a single page type property value on a post.
 `DELETE /wp-json/papi/v1/fields/{id}/{property_slug}`
 
 Delete a single page type property value on a post.
+
+### Options
 
 `GET /wp-json/papi/v1/options`
 
