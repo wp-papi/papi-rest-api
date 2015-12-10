@@ -24,7 +24,8 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * Check if a given request has access to delete a option value.
 	 *
 	 * @param  WP_REST_Request $request
-	 * @return string
+	 *
+	 * @return bool|WP_Error
 	 */
 	public function delete_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
@@ -210,7 +211,8 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * Check if a given request has access to update a option value.
 	 *
 	 * @param  WP_REST_Request $request
-	 * @return string
+	 *
+	 * @return bool|WP_Error
 	 */
 	public function update_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
