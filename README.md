@@ -8,9 +8,13 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 ## Endpoints
 
-`/wp-json/papi/v1/options`
+`GET /wp-json/papi/v1/options`
 
-`/wp-json/papi/v1/options/{option-name}`
+`GET /wp-json/papi/v1/options/{option-name}`
+
+`PUT /wp-json/papi/v1/options/{option-name}`
+
+`DELETE /wp-json/papi/v1/options/{option-name}`
 
 ## Filters
 
