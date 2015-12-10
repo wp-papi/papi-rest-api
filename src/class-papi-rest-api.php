@@ -63,6 +63,10 @@ class Papi_REST_API {
 		// Options controller.
 		$controller = new Papi_REST_API_Options_Controller;
 		$controller->register_routes();
+
+		// Fields controller.
+		$controller = new Papi_REST_API_Fields_Controller;
+		$controller->register_routes();
 	}
 
 	/**

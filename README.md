@@ -8,19 +8,35 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 ## Endpoints
 
+`GET /wp-json/papi/v1/fields/{id}`
+
+Get all page types properties on a post.
+
+`GET /wp-json/papi/v1/fields/{id}/{property_slug}`
+
+Get a single page type property on a post.
+
+`PUT /wp-json/papi/v1/fields/{id}/{property_slug}`
+
+Update a single page type property value on a post.
+
+`DELETE /wp-json/papi/v1/fields/{id}/{property_slug}`
+
+Delete a single page type property value on a post.
+
 `GET /wp-json/papi/v1/options`
 
 Get all option types properties.
 
-`GET /wp-json/papi/v1/options/{option-slug}`
+`GET /wp-json/papi/v1/options/{property_slug}`
 
 Get a single option type property.
 
-`PUT /wp-json/papi/v1/options/{option-slug}`
+`PUT /wp-json/papi/v1/options/{property_slug}`
 
 Update a single option type property value.
 
-`DELETE /wp-json/papi/v1/options/{option-slug}`
+`DELETE /wp-json/papi/v1/options/{property_slug}`
 
 Delete a single option type property value.
 
