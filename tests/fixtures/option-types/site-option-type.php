@@ -2,7 +2,7 @@
 
 class Site_Option_Type extends Papi_Option_Type {
 
-	public function option_type() {
+	public function meta() {
 		return [
 			'name' => 'Site',
 			'menu' => 'options-general.php'

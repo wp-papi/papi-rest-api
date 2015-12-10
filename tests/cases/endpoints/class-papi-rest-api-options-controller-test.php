@@ -21,31 +21,85 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 
 		$this->assertArrayHasKey( '/papi/v1/options', $routes );
 		$this->assertCount( 1, $routes['/papi/v1/options'] );
-		$this->assertArrayHasKey( '/papi/v1/options/(?P<option>.+)', $routes );
-		$this->assertCount( 1, $routes['/papi/v1/options/(?P<option>.+)'] );
+		$this->assertArrayHasKey( '/papi/v1/options/(?P<slug>.+)', $routes );
+		$this->assertCount( 1, $routes['/papi/v1/options/(?P<slug>.+)'] );
 	}
 
 	public function test_get_options_slugs() {
 		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( ['name'], $data );
+		$expected = (object) [
+			'title'  => 'Name',
+			'type'   => 'string',
+			'slug'   => 'name',
+			'value'  => null,
+			'_links' => [
+				'self' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options/name'
+					]
+				],
+				'collection' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options'
+					]
+				]
+			]
+		];
+		$this->assertEquals( $expected, $data[0] );
 	}
 
 	public function test_get_empty_option_value() {
 		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
-		$request->set_param( 'option', 'name' );
+		$request->set_param( 'slug', 'name' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( ['value' => null], $data );
+		$expected = (object) [
+			'title'  => 'Name',
+			'type'   => 'string',
+			'slug'   => 'name',
+			'value'  => null,
+			'_links' => [
+				'self' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options/name'
+					]
+				],
+				'collection' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options'
+					]
+				]
+			]
+		];
+		$this->assertEquals( $expected, $data );
 	}
 
 	public function test_get_option_value() {
 		update_option('name', 'Fredrik');
 		$request = new WP_REST_Request( 'GET', '/papi/v1/options' );
-		$request->set_param( 'option', 'name' );
+		$request->set_param( 'slug', 'name' );
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
-		$this->assertEquals( ['value' => 'Fredrik'], $data );
+		$expected = (object) [
+			'title'  => 'Name',
+			'type'   => 'string',
+			'slug'   => 'name',
+			'value'  => 'Fredrik',
+			'_links' => [
+				'self' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options/name'
+					]
+				],
+				'collection' => [
+					[
+						'href' => 'http://example.org/?rest_route=/papi/v1/options'
+					]
+				]
+			]
+		];
+		$this->assertEquals( $expected, $data );
 	}
 }

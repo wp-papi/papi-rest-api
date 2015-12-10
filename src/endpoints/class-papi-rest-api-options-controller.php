@@ -46,6 +46,10 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 		$page     = new Papi_Option_Page();
 		$property = $page->get_property( $slug );
 
+		if ( ! papi_is_property( $property ) ) {
+			return;
+		}
+
 		return $this->create_property_item( $property );
 	}
 
