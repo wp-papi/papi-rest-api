@@ -32,8 +32,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$expected = [
 			'code'    => 'papi_cannot_delete_option',
-			'message' => 'Sorry, you are not allowed to delete the option value',
-			'data'    => ['status' => 403]
+			'message' => 'Sorry, you are not allowed to delete the option value.',
+			'data'    => ['status' => 401]
 		];
 
 		$this->assertEquals( $expected, $data );
@@ -49,7 +49,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$expected = [
 			'code'    => 'papi_delete_option_error',
-			'message' => 'Delete option value did not work. The property may not be found',
+			'message' => 'Delete option value did not work. The property may not be found.',
 			'data'    => ['status' => 500]
 		];
 
@@ -105,7 +105,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$expected = [
 			'code'    => 'papi_slug_invalid',
-			'message' => 'Option slug doesn\'t exist',
+			'message' => 'Option slug doesn\'t exist.',
 			'data'    => ['status' => 404]
 		];
 
@@ -200,8 +200,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$expected = [
 			'code'    => 'papi_cannot_update_option',
-			'message' => 'Sorry, you are not allowed to update the option value',
-			'data'    => ['status' => 403]
+			'message' => 'Sorry, you are not allowed to update the option value.',
+			'data'    => ['status' => 401]
 		];
 
 		$this->assertEquals( $expected, $data );
@@ -218,7 +218,7 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$data = $response->get_data();
 		$expected = [
 			'code'    => 'papi_update_option_error',
-			'message' => 'Update option value did not work. The property may not be found',
+			'message' => 'Update option value did not work. The property may not be found.',
 			'data'    => ['status' => 500]
 		];
 

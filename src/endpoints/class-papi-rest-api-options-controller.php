@@ -24,7 +24,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			return (object) ['deleted' => true];
 		}
 
-		return new WP_Error( 'papi_delete_option_error', __( 'Delete option value did not work. The property may not be found', 'papi-rest-api' ), ['status' => 500] );
+		return new WP_Error( 'papi_delete_option_error', __( 'Delete option value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
 	}
 
 	/**
@@ -37,7 +37,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	public function delete_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
 			if ( ! current_user_can( $capability ) ) {
-				return new WP_Error( 'papi_cannot_delete_option', __( 'Sorry, you are not allowed to delete the option value', 'papi-rest-api' ), ['status' => 403] );
+				return new WP_Error( 'papi_cannot_delete_option', __( 'Sorry, you are not allowed to delete the option value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 			}
 		}
 
@@ -85,7 +85,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 		$property = $page->get_property( $request['slug'] );
 
 		if ( ! papi_is_property( $property ) ) {
-			return new WP_Error( 'papi_slug_invalid', __( 'Option slug doesn\'t exist', 'papi-rest-api' ) , ['status' => 404] );
+			return new WP_Error( 'papi_slug_invalid', __( 'Option slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
 		}
 
 		return $this->create_property_item( $request, $property, [
@@ -189,7 +189,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			return $this->get_option_property( $request );
 		}
 
-		return new WP_Error( 'papi_update_option_error', __( 'Update option value did not work. The property may not be found', 'papi-rest-api' ), ['status' => 500] );
+		return new WP_Error( 'papi_update_option_error', __( 'Update option value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
 	}
 
 	/**
@@ -202,7 +202,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	public function update_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
 			if ( ! current_user_can( $capability ) ) {
-				return new WP_Error( 'papi_cannot_update_option', __( 'Sorry, you are not allowed to update the option value', 'papi-rest-api' ), ['status' => 403] );
+				return new WP_Error( 'papi_cannot_update_option', __( 'Sorry, you are not allowed to update the option value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 			}
 		}
 
