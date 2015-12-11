@@ -32,6 +32,7 @@ class Papi_REST_API {
 	 */
 	private function __construct() {
 		spl_autoload_register( [$this, 'autoload'] );
+		$this->require_files();
 		$this->setup_actions();
 	}
 
@@ -67,6 +68,13 @@ class Papi_REST_API {
 		// Fields controller.
 		$controller = new Papi_REST_API_Fields_Controller;
 		$controller->register_routes();
+	}
+
+	/**
+	 * Require files.
+	 */
+	public function require_files() {
+		require_once __DIR__ . '/functions.php';
 	}
 
 	/**
