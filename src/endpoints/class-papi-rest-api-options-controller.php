@@ -13,6 +13,33 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	protected $route = 'options';
 
 	/**
+	 * Register the options-related routes.
+	 */
+	public function register_routes() {
+		register_rest_route( $this->namespace, $this->route, [
+			'methods'  => WP_REST_Server::READABLE,
+			'callback' => [$this, 'get_options']
+		] );
+
+		register_rest_route( $this->namespace, $this->route . '/(?P<slug>.+)', [
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [$this, 'get_option']
+			],
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [$this, 'update_option'],
+				'permission_callback' => [$this, 'update_option_permissions_check']
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [$this, 'delete_option'],
+				'permission_callback' => [$this, 'delete_option_permissions_check']
+			]
+		] );
+	}
+
+	/**
 	 * Delete option.
 	 *
 	 * @param  WP_REST_Request $request
@@ -24,7 +51,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			return (object) ['deleted' => true];
 		}
 
-		return new WP_Error( 'papi_delete_option_error', __( 'Delete option value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+		return new WP_Error( 'papi_delete_property_error', __( 'Delete property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
 	}
 
 	/**
@@ -37,7 +64,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	public function delete_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
 			if ( ! current_user_can( $capability ) ) {
-				return new WP_Error( 'papi_cannot_delete_option', __( 'Sorry, you are not allowed to delete the option value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+				return new WP_Error( 'papi_cannot_delete_property', __( 'Sorry, you are not allowed to delete the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 			}
 		}
 
@@ -69,23 +96,22 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * @return object
 	 */
 	public function get_option( WP_REST_Request $request ) {
-		return $this->get_option_property( $request );
+		return $this->get_property( $request );
 	}
 
 	/**
-	 * Get option property.
+	 * Get property.
 	 *
 	 * @param  WP_REST_Request $request
-	 * @param  string $slug
 	 *
 	 * @return object|WP_Error
 	 */
-	protected function get_option_property( WP_REST_Request $request ) {
+	protected function get_property( WP_REST_Request $request ) {
 		$page     = new Papi_Option_Page();
 		$property = $page->get_property( $request['slug'] );
 
 		if ( ! papi_is_property( $property ) ) {
-			return new WP_Error( 'papi_slug_invalid', __( 'Option slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+			return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
 		}
 
 		return $this->create_property_item( $request, $property, [
@@ -151,30 +177,29 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Register the options-related routes.
+	 * Prepare links for the response.
+	 *
+	 * @param  object          $item
+	 * @param  string          $slug
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return object
 	 */
-	public function register_routes() {
-		register_rest_route( $this->namespace, $this->route, [
-			'methods'  => WP_REST_Server::READABLE,
-			'callback' => [$this, 'get_options']
-		] );
-
-		register_rest_route( $this->namespace, $this->route . '/(?P<slug>.+)', [
-			[
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => [$this, 'get_option']
+	protected function prepare_links( $items, $slug, WP_REST_Request $request ) {
+		$items->_links = [
+			'self' => [
+				[
+					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->route, $slug ) )
+				]
 			],
-			[
-				'methods'             => WP_REST_Server::EDITABLE,
-				'callback'            => [$this, 'update_option'],
-				'permission_callback' => [$this, 'update_option_permissions_check']
-			],
-			[
-				'methods'             => WP_REST_Server::DELETABLE,
-				'callback'            => [$this, 'delete_option'],
-				'permission_callback' => [$this, 'delete_option_permissions_check']
+			'collection' => [
+				[
+					'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->route ) )
+				]
 			]
-		] );
+		];
+
+		return $items;
 	}
 
 	/**
@@ -186,10 +211,10 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function update_option( WP_REST_Request $request ) {
 		if ( papi_update_option( $request['slug'], $request['value'] ) ) {
-			return $this->get_option_property( $request );
+			return $this->get_property( $request );
 		}
 
-		return new WP_Error( 'papi_update_option_error', __( 'Update option value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+		return new WP_Error( 'papi_update_property_error', __( 'Update property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
 	}
 
 	/**
@@ -202,7 +227,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	public function update_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
 			if ( ! current_user_can( $capability ) ) {
-				return new WP_Error( 'papi_cannot_update_option', __( 'Sorry, you are not allowed to update the option value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 			}
 		}
 

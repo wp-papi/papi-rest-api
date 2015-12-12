@@ -31,8 +31,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_cannot_delete_option',
-			'message' => 'Sorry, you are not allowed to delete the option value.',
+			'code'    => 'papi_cannot_delete_property',
+			'message' => 'Sorry, you are not allowed to delete the property value.',
 			'data'    => ['status' => 401]
 		];
 
@@ -48,8 +48,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_delete_option_error',
-			'message' => 'Delete option value did not work. The property may not be found.',
+			'code'    => 'papi_delete_property_error',
+			'message' => 'Delete property value did not work. The property may not be found.',
 			'data'    => ['status' => 500]
 		];
 
@@ -104,8 +104,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_slug_invalid',
-			'message' => 'Option slug doesn\'t exist.',
+			'code'    => 'papi_property_slug_invalid',
+			'message' => 'Property slug doesn\'t exist.',
 			'data'    => ['status' => 404]
 		];
 
@@ -199,8 +199,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_cannot_update_option',
-			'message' => 'Sorry, you are not allowed to update the option value.',
+			'code'    => 'papi_cannot_update_property',
+			'message' => 'Sorry, you are not allowed to update the property value.',
 			'data'    => ['status' => 401]
 		];
 
@@ -217,8 +217,8 @@ class Papi_REST_API_Options_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_update_option_error',
-			'message' => 'Update option value did not work. The property may not be found.',
+			'code'    => 'papi_update_property_error',
+			'message' => 'Update property value did not work. The property may not be found.',
 			'data'    => ['status' => 500]
 		];
 

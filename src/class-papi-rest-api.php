@@ -37,6 +37,25 @@ class Papi_REST_API {
 	}
 
 	/**
+	 * Adds extra post type registration arguments.
+	 */
+	public function add_extra_api_post_type_arguments() {
+		global $wp_post_types;
+
+		if ( isset( $wp_post_types['post'] ) && ! isset( $wp_post_types['post']->show_in_rest ) ) {
+			$wp_post_types['post']->show_in_rest = true;
+		}
+
+		if ( isset( $wp_post_types['page'] ) && ! isset( $wp_post_types['page']->show_in_rest ) ) {
+			$wp_post_types['page']->show_in_rest = true;
+		}
+
+		if ( isset( $wp_post_types['attachment'] ) && ! isset( $wp_post_types['attachment']->show_in_rest ) ) {
+			$wp_post_types['attachment']->show_in_rest = true;
+		}
+	}
+
+	/**
 	 * Autoload Papi REST API classes.
 	 *
 	 * @codeCoverageIgnore
@@ -81,6 +100,7 @@ class Papi_REST_API {
 	 * Setup actions.
 	 */
 	private function setup_actions() {
+		add_filter( 'init', [$this, 'add_extra_api_post_type_arguments'], 11 );
 		add_action( 'rest_api_init', [$this, 'register_routes'] );
 	}
 }

@@ -26,7 +26,7 @@ WP_Test_Suite::run( function () {
 	 * @return string
 	 */
 	add_filter( 'papi/settings/directories', function () {
-		return __DIR__ . '/fixtures/option-types';
+		return [__DIR__ . '/data/option-types', __DIR__ . '/data/page-types'];
 	} );
 
 } );

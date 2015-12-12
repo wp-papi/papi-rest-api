@@ -86,46 +86,26 @@ abstract class Papi_REST_API_Controller {
 
 		ksort( $item );
 
-		// $item = array_merge( $item, $extra );
-
-		return $this->prepare_links( (object)$item, $property->get_slug( true ) );
+		return $this->prepare_links( (object)$item, $property->get_slug( true ), $request );
 	}
 
 	/**
-	 * Prepare fields that should be returned to the client.
+	 * Get property.
 	 *
 	 * @param  WP_REST_Request $request
-	 * @param  string          $item
-	 * @param  array           $extra
 	 *
-	 * @return object
+	 * @return object|WP_Error
 	 */
-	protected function prepare_fields( WP_REST_Request $request, Papi_Core_Property $property, $item, array $extra = [] ) {
-	}
+	abstract protected function get_property( WP_REST_Request $request );
 
 	/**
-	 * Prepare links for the request.
+	 * Prepare links.
 	 *
-	 * @param  object $items
-	 * @param  string $slug
+	 * @param  object          $item
+	 * @param  string          $slug
+	 * @param  WP_REST_Request $request
 	 *
 	 * @return object
 	 */
-	protected function prepare_links( $items, $slug ) {
-		$items->_links = [
-			'self' => [
-				[
-					'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->route, $slug ) )
-				]
-			],
-			'collection' => [
-				[
-					'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->route ) )
-				]
-			]
-		];
-
-		return $items;
-	}
-
+	abstract protected function prepare_links( $item, $slug, WP_REST_Request $request );
 }
