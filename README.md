@@ -10,11 +10,11 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 ### Fields
 
-`GET /wp-json/papi/v1/fields/{id}`
+`GET: /wp-json/papi/v1/fields/{id}`
 
 Get all page types properties on a post.
 
-`POST/PUT/PATCH /wp-json/papi/v1/fields/{id}`
+`POST/PUT/PATCH: /wp-json/papi/v1/fields/{id}`
 
 Create/Update properties values.
 
@@ -29,11 +29,11 @@ Create/Update properties values.
 }
 ```
 
-`GET /wp-json/papi/v1/fields/{id}/{property_slug}`
+`GET: /wp-json/papi/v1/fields/{id}/{property_slug}`
 
 Get a single page type property on a post.
 
-`POST/PUT/PATCH /wp-json/papi/v1/fields/{id}/{property_slug}`
+`POST/PUT/PATCH: /wp-json/papi/v1/fields/{id}/{property_slug}`
 
 Update a single page type property value on a post.
 
@@ -43,21 +43,21 @@ Update a single page type property value on a post.
 }
 ```
 
-`DELETE /wp-json/papi/v1/fields/{id}/{property_slug}`
+`DELETE: /wp-json/papi/v1/fields/{id}/{property_slug}`
 
 Delete a single page type property value on a post.
 
 ### Options
 
-`GET /wp-json/papi/v1/options`
+`GET: /wp-json/papi/v1/options`
 
 Get all option types properties.
 
-`GET /wp-json/papi/v1/options/{property_slug}`
+`GET: /wp-json/papi/v1/options/{property_slug}`
 
 Get a single option type property.
 
-`POST/PUT/PATCH /wp-json/papi/v1/options/{property_slug}`
+`POST/PUT/PATCH: /wp-json/papi/v1/options/{property_slug}`
 
 Update a single option type property value.
 
@@ -67,7 +67,7 @@ Update a single option type property value.
 }
 ```
 
-`DELETE /wp-json/papi/v1/options/{property_slug}`
+`DELETE: /wp-json/papi/v1/options/{property_slug}`
 
 Delete a single option type property value.
 
