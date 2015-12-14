@@ -16,7 +16,7 @@ Get all page types properties on a post.
 
 `POST/PUT/PATCH /wp-json/papi/v1/fields/{id}`
 
-Create/Update properties values.
+Update properties values.
 
 ```json
 {
