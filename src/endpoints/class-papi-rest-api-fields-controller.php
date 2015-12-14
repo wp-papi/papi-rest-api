@@ -17,8 +17,15 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route( $this->namespace, $this->route . '/(?P<id>[\d]+)', [
-			'methods'  => WP_REST_Server::READABLE,
-			'callback' => [$this, 'get_fields']
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [$this, 'get_fields']
+			],
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [$this, 'update_fields'],
+				'permission_callback' => [$this, 'update_fields_permissions_check']
+			]
 		] );
 
 		register_rest_route( $this->namespace, $this->route . '/(?P<id>[\d]+)/(?P<slug>.+)', [
@@ -159,6 +166,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		foreach ( $boxes as $box ) {
 			foreach ( $box->properties as $property ) {
 				if ( papi_is_property( $property ) ) {
+					$property->set_post_id( $request['id'] );
 					$properties[] = $this->create_property_item( $request, $property, [
 						'page_type' => $page_type->get_id()
 					] );
@@ -187,7 +195,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Get property.
+	 * Get property from the request.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -208,6 +216,96 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		return $this->create_property_item( $request, $property, [
 			'page_type' => $page->get_page_type()->get_id()
 		] );
+	}
+
+	/**
+	 * Get properties from the request.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array
+	 */
+	protected function get_properties( WP_REST_Request $request ) {
+		$page       = new Papi_Post_Page( $request['id'] );
+		$properties = [];
+
+		if ( ! is_array( $request['properties'] ) ) {
+			return $properties;
+		}
+
+		foreach ( $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) ) {
+				continue;
+			}
+
+			if ( ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			$property = $page->get_property( $property['slug'] );
+
+			if ( ! papi_is_property( $property ) ) {
+				return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+			}
+
+			// Since we are fetching data from a post
+			// we need to set the post id the property aswell.
+			$property->set_post_id( $request['id'] );
+
+			$properties[] = $this->create_property_item( $request, $property, [
+				'page_type' => $page->get_page_type()->get_id()
+			] );
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Get properties capabilities.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array
+	 */
+	protected function get_properties_capabilities( WP_REST_Request $request ) {
+		$page         = new Papi_Post_Page( $request['id'] );
+		$capabilities = [];
+
+		if ( ! is_array( $request['properties'] ) && ! empty( $request['slug'] ) ) {
+			$request['properties'] = [
+				[
+					'slug' => $request['slug']
+				]
+			];
+		}
+
+		if ( empty( $request['properties'] ) ) {
+			return $capabilities;
+		}
+
+		foreach ( $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) ) {
+				continue;
+			}
+
+			if ( ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			$property = $page->get_property( $property['slug'] );
+
+			if ( ! papi_is_property( $property ) ) {
+				return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+			}
+
+			$capabilities = array_merge( $capabilities, $property->capabilities );
+		}
+
+		return array_unique( $capabilities );
 	}
 
 	/**
@@ -252,6 +350,33 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
+	 * Update fields on a post.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array|WP_Error
+	 */
+	public function update_fields( WP_REST_Request $request ) {
+		if ( ! is_array( $request['properties'] ) || empty( $request['properties'] ) ) {
+			return new WP_Error( 'papi_cannot_update_properties', __( 'Empty properties array.', 'papi-rest-api' ), ['status' => 500] );
+		}
+
+		foreach ( (array) $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) || ! isset( $property['slug'], $property['value'] ) ) {
+				continue;
+			}
+
+			if ( ! papi_update_field( $request['id'], $property['slug'], $property['value'] ) ) {
+				return new WP_Error( 'papi_update_property_error', __( 'Update property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+			}
+		}
+
+		return $this->get_properties( $request );
+	}
+
+	/**
 	 * Check if a given request has access to update a field value.
 	 *
 	 * @param  WP_REST_Request $request
@@ -270,10 +395,36 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 			return new WP_Error( 'papi_cannot_edit_others', __( 'You are not allowed to update posts as this user.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 		}
 
-		if ( ! empty( $request['sticky'] ) && ! current_user_can( $post_type->cap->edit_others_posts ) ) {
-			return new WP_Error( 'papi_cannot_assign_sticky', __( 'You do not have permission to make posts sticky.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+			}
 		}
 
 		return true;
+	}
+
+	/**
+	 * Check if a given request has access to update properties.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function update_fields_permissions_check( WP_REST_Request $request ) {
+		$post = get_post( $request['id'] );
+		$post_type = get_post_type_object( $post->post_type );
+
+		if ( ! empty( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( $post_type->cap->edit_others_posts ) ) {
+			return new WP_Error( 'papi_cannot_edit_others', __( 'You are not allowed to update posts as this user.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+		}
+
+		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+			}
+		}
+
+		return current_user_can( $post_type->cap->create_posts );
 	}
 }

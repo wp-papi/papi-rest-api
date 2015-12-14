@@ -14,6 +14,11 @@ class Simple_Content_Page_Type extends Papi_Page_Type {
 				'title'    => 'Name',
 				'slug'     => 'name',
 				'type'     => 'string'
+			] ),
+			papi_property( [
+				'title'    => 'Text',
+				'slug'     => 'text',
+				'type'     => 'text'
 			] )
 		] );
 	}
