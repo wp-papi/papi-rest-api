@@ -24,7 +24,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 			[
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [$this, 'update_fields'],
-				'permission_callback' => [$this, 'update_fields_permissions_check']
+				'permission_callback' => [$this, 'update_field_permissions_check']
 			]
 		] );
 
@@ -402,29 +402,5 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check if a given request has access to update properties.
-	 *
-	 * @param  WP_REST_Request $request
-	 *
-	 * @return bool|WP_Error
-	 */
-	public function update_fields_permissions_check( WP_REST_Request $request ) {
-		$post = get_post( $request['id'] );
-		$post_type = get_post_type_object( $post->post_type );
-
-		if ( ! empty( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( $post_type->cap->edit_others_posts ) ) {
-			return new WP_Error( 'papi_cannot_edit_others', __( 'You are not allowed to update posts as this user.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
-		}
-
-		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
-			if ( ! current_user_can( $capability ) ) {
-				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
-			}
-		}
-
-		return current_user_can( $post_type->cap->create_posts );
 	}
 }
