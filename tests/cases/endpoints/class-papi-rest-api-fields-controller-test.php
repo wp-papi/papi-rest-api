@@ -20,7 +20,7 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		$routes = $this->server->get_routes();
 
 		$this->assertArrayHasKey( '/papi/v1/fields/(?P<id>[\d]+)', $routes );
-		$this->assertCount( 2, $routes['/papi/v1/fields/(?P<id>[\d]+)'] );
+		$this->assertCount( 3, $routes['/papi/v1/fields/(?P<id>[\d]+)'] );
 		$this->assertArrayHasKey( '/papi/v1/fields/(?P<id>[\d]+)/(?P<slug>.+)', $routes );
 		$this->assertCount( 3, $routes['/papi/v1/fields/(?P<id>[\d]+)/(?P<slug>.+)'] );
 	}
@@ -99,7 +99,7 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		$response = $this->server->dispatch( $request );
 		$data = $response->get_data();
 		$expected = [
-			'code'    => 'papi_cannot_update_properties',
+			'code'    => 'papi_cannot_delete_properties',
 			'message' => 'Empty properties array.',
 			'data'    => ['status' => 500]
 		];
