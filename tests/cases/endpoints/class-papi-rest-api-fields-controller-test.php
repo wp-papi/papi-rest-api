@@ -88,6 +88,61 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		wp_set_current_user( 0 );
 	}
 
+	public function test_delete_fields_empty_array() {
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+
+		$post_id = $this->factory->post->create();
+		update_post_meta( $post_id, papi_get_page_Type_key(), 'simple-content-page-type' );
+
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/papi/v1/fields/%d', $post_id ) );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$expected = [
+			'code'    => 'papi_cannot_update_properties',
+			'message' => 'Empty properties array.',
+			'data'    => ['status' => 500]
+		];
+
+		$this->assertEquals( $expected, $data );
+		wp_set_current_user( 0 );
+	}
+
+	public function test_delete_fields() {
+		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $user_id );
+
+		$post_id = $this->factory->post->create();
+		update_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
+		update_post_meta( $post_id, 'name', 'Fredrik' );
+		update_post_meta( $post_id, 'text', 'Hello, world!' );
+
+		$this->assertSame( 'Fredrik', papi_get_field( $post_id, 'name' ) );
+		$this->assertSame( 'Hello, world!', papi_get_field( $post_id, 'text' ) );
+
+		$request = new WP_REST_Request( 'DELETE', sprintf( '/papi/v1/fields/%d', $post_id ) );
+		$request->set_param( 'properties', [
+			[
+				'slug' => 'name'
+			],
+			[
+				'slug' => 'text'
+			]
+		] );
+		$response = $this->server->dispatch( $request );
+		$data = $response->get_data();
+		$expected = (object) [
+			'deleted' => true
+		];
+
+		$this->assertEquals( $expected, $data );
+
+		$this->assertNull( papi_get_field( $post_id, 'name' ) );
+		$this->assertNull( papi_get_field( $post_id, 'text' ) );
+
+		wp_set_current_user( 0 );
+	}
+
 	public function test_delete_field_value_access_denied() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );

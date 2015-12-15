@@ -25,6 +25,11 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 				'methods'             => WP_REST_Server::EDITABLE,
 				'callback'            => [$this, 'update_fields'],
 				'permission_callback' => [$this, 'update_field_permissions_check']
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [$this, 'delete_fields'],
+				'permission_callback' => [$this, 'delete_field_permissions_check']
 			]
 		] );
 
@@ -99,7 +104,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Delete a field value on a post.
+	 * Delete a property value on a post.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -114,7 +119,34 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to delete a field value.
+	 * Delete a properties value on a post.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array|WP_Error
+	 */
+	public function delete_fields( WP_REST_Request $request ) {
+		if ( ! is_array( $request['properties'] ) || empty( $request['properties'] ) ) {
+			return new WP_Error( 'papi_cannot_delete_properties', __( 'Empty properties array.', 'papi-rest-api' ), ['status' => 500] );
+		}
+
+		foreach ( (array) $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) || ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			if ( ! papi_delete_field( $request['id'], $property['slug'] ) ) {
+				return new WP_Error( 'papi_delete_property_error', __( 'Delete property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+			}
+		}
+
+		return (object) ['deleted' => true];
+	}
+
+	/**
+	 * Check if a given request has access to delete a property value.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
