@@ -88,7 +88,7 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		wp_set_current_user( 0 );
 	}
 
-	public function test_delete_option_value_access_denied() {
+	public function test_delete_field_value_access_denied() {
 		$post_id = $this->factory->post->create();
 		add_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
 		add_post_meta( $post_id, 'name', 'Fredrik' );
