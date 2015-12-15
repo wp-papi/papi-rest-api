@@ -17,8 +17,20 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route( $this->namespace, $this->route, [
-			'methods'  => WP_REST_Server::READABLE,
-			'callback' => [$this, 'get_options']
+			[
+				'methods'             => WP_REST_Server::READABLE,
+				'callback'            => [$this, 'get_options']
+			],
+			[
+				'methods'             => WP_REST_Server::EDITABLE,
+				'callback'            => [$this, 'update_options'],
+				'permission_callback' => [$this, 'update_option_permissions_check']
+			],
+			[
+				'methods'             => WP_REST_Server::DELETABLE,
+				'callback'            => [$this, 'delete_options'],
+				'permission_callback' => [$this, 'delete_option_permissions_check']
+			]
 		] );
 
 		register_rest_route( $this->namespace, $this->route . '/(?P<slug>.+)', [
@@ -47,7 +59,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 * @return object|WP_Error
 	 */
 	public function delete_option( WP_REST_Request $request ) {
-		if ( papi_delete_option( $request['slug'], $request['value'] ) ) {
+		if ( papi_delete_option( $request['slug'] ) ) {
 			return (object) ['deleted' => true];
 		}
 
@@ -68,7 +80,40 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 			}
 		}
 
+		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return new WP_Error( 'papi_cannot_delete_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+			}
+		}
+
 		return true;
+	}
+
+	/**
+	 * Delete properties value on a post.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array|WP_Error
+	 */
+	public function delete_options( WP_REST_Request $request ) {
+		if ( ! is_array( $request['properties'] ) || empty( $request['properties'] ) ) {
+			return new WP_Error( 'papi_cannot_delete_properties', __( 'Empty properties array.', 'papi-rest-api' ), ['status' => 500] );
+		}
+
+		foreach ( (array) $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) || ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			if ( ! papi_delete_option( $property['slug'] ) ) {
+				return new WP_Error( 'papi_delete_property_error', __( 'Delete property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+			}
+		}
+
+		return (object) ['deleted' => true];
 	}
 
 	/**
@@ -97,26 +142,6 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function get_option( WP_REST_Request $request ) {
 		return $this->get_property( $request );
-	}
-
-	/**
-	 * Get property.
-	 *
-	 * @param  WP_REST_Request $request
-	 *
-	 * @return object|WP_Error
-	 */
-	protected function get_property( WP_REST_Request $request ) {
-		$page     = new Papi_Option_Page();
-		$property = $page->get_property( $request['slug'] );
-
-		if ( ! papi_is_property( $property ) ) {
-			return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
-		}
-
-		return $this->create_property_item( $request, $property, [
-			'option_type' => $page->get_option_type()->get_id()
-		] );
 	}
 
 	/**
@@ -177,6 +202,110 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
+	 * Get property.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return object|WP_Error
+	 */
+	protected function get_property( WP_REST_Request $request ) {
+		$page     = new Papi_Option_Page();
+		$property = $page->get_property( $request['slug'] );
+
+		if ( ! papi_is_property( $property ) ) {
+			return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+		}
+
+		return $this->create_property_item( $request, $property, [
+			'option_type' => $page->get_option_type()->get_id()
+		] );
+	}
+
+	/**
+	 * Get properties from the request.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array
+	 */
+	protected function get_properties( WP_REST_Request $request ) {
+		$page       = new Papi_Option_Page();
+		$properties = [];
+
+		if ( ! is_array( $request['properties'] ) ) {
+			return $properties;
+		}
+
+		foreach ( $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) ) {
+				continue;
+			}
+
+			if ( ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			$property = $page->get_property( $property['slug'] );
+
+			if ( ! papi_is_property( $property ) ) {
+				return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+			}
+
+			$properties[] = $this->create_property_item( $request, $property, [
+				'option_type' => $page->get_option_type()->get_id()
+			] );
+		}
+
+		return $properties;
+	}
+
+	/**
+	 * Get properties capabilities.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array
+	 */
+	protected function get_properties_capabilities( WP_REST_Request $request ) {
+		$page         = new Papi_Option_Page();
+		$capabilities = [];
+
+		if ( ! is_array( $request['properties'] ) && ! empty( $request['slug'] ) ) {
+			$request['properties'] = [
+				[
+					'slug' => $request['slug']
+				]
+			];
+		}
+
+		if ( empty( $request['properties'] ) ) {
+			return $capabilities;
+		}
+
+		foreach ( $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) ) {
+				continue;
+			}
+
+			if ( ! isset( $property['slug'] ) ) {
+				continue;
+			}
+
+			$property = $page->get_property( $property['slug'] );
+
+			if ( papi_is_property( $property ) ) {
+				$capabilities = array_merge( $capabilities, $property->capabilities );
+			}
+		}
+
+		return array_unique( $capabilities );
+	}
+
+	/**
 	 * Prepare links for the response.
 	 *
 	 * @param  object          $item
@@ -218,6 +347,33 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
+	 * Update property values in options table.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array|WP_Error
+	 */
+	public function update_options( WP_REST_Request $request ) {
+		if ( ! is_array( $request['properties'] ) || empty( $request['properties'] ) ) {
+			return new WP_Error( 'papi_cannot_update_properties', __( 'Empty properties array.', 'papi-rest-api' ), ['status' => 500] );
+		}
+
+		foreach ( (array) $request['properties'] as $property ) {
+			$property = is_object( $property ) ? (array) $property : $property;
+
+			if ( ! is_array( $property ) || ! isset( $property['slug'], $property['value'] ) ) {
+				continue;
+			}
+
+			if ( ! papi_update_option( $property['slug'], $property['value'] ) ) {
+				return new WP_Error( 'papi_update_property_error', __( 'Update property value did not work. The property may not be found.', 'papi-rest-api' ), ['status' => 500] );
+			}
+		}
+
+		return $this->get_properties( $request );
+	}
+
+	/**
 	 * Check if a given request has access to update a option value.
 	 *
 	 * @param  WP_REST_Request $request
@@ -226,6 +382,12 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	public function update_option_permissions_check( WP_REST_Request $request ) {
 		foreach ( $this->get_option_types_capabilities() as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+			}
+		}
+
+		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
 			if ( ! current_user_can( $capability ) ) {
 				return new WP_Error( 'papi_cannot_update_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
 			}

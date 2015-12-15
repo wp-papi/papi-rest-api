@@ -43,6 +43,20 @@ Update a single page type property value on a post.
 }
 ```
 
+`DELETE /wp-json/papi/v1/fields/{id}`
+
+Delete multiple property values.
+
+```json
+{
+  "properties": [
+    {
+      "slug":  "name"
+    }
+  ]
+}
+```
+
 `DELETE /wp-json/papi/v1/fields/{id}/{property_slug}`
 
 Delete a single page type property value on a post.
@@ -52,6 +66,21 @@ Delete a single page type property value on a post.
 `GET /wp-json/papi/v1/options`
 
 Get all option types properties.
+
+`POST/PUT/PATCH /wp-json/papi/v1/options`
+
+Update multiple property values.
+
+```json
+{
+  "properties": [
+    {
+      "slug":  "name",
+      "value": "Fredrik"
+    }
+  ]
+}
+```
 
 `GET /wp-json/papi/v1/options/{property_slug}`
 
@@ -64,6 +93,20 @@ Update a single option type property value.
 ```json
 {
   "value": "Fredrik"
+}
+```
+
+`DELETE /wp-json/papi/v1/options`
+
+Delete multiple property values.
+
+```json
+{
+  "properties": [
+    {
+      "slug":  "name"
+    }
+  ]
 }
 ```
 

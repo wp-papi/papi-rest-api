@@ -15,6 +15,11 @@ class Site_Option_Type extends Papi_Option_Type {
 				'title'    => 'Name',
 				'slug'     => 'name',
 				'type'     => 'string'
+			] ),
+			papi_property( [
+				'title'    => 'Text',
+				'slug'     => 'text',
+				'type'     => 'text'
 			] )
 		] );
 	}

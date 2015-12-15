@@ -119,6 +119,29 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
+	 * Check if a given request has access to delete a property value.
+	 *
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function delete_field_permissions_check( WP_REST_Request $request ) {
+		$post = get_post( $request['id'] );
+
+		if ( $post && ! $this->check_delete_permission( $post ) ) {
+			return new WP_Error( 'papi_cannot_delete_property', __( 'Sorry, you are not allowed to delete the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+		}
+
+		foreach ( $this->get_properties_capabilities( $request ) as $capability ) {
+			if ( ! current_user_can( $capability ) ) {
+				return new WP_Error( 'papi_cannot_delete_property', __( 'Sorry, you are not allowed to update the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Delete properties value on a post.
 	 *
 	 * @param  WP_REST_Request $request
@@ -143,23 +166,6 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 		}
 
 		return (object) ['deleted' => true];
-	}
-
-	/**
-	 * Check if a given request has access to delete a property value.
-	 *
-	 * @param  WP_REST_Request $request
-	 *
-	 * @return bool|WP_Error
-	 */
-	public function delete_field_permissions_check( WP_REST_Request $request ) {
-		$post = get_post( $request['id'] );
-
-		if ( $post && ! $this->check_delete_permission( $post ) ) {
-			return new WP_Error( 'papi_cannot_delete_property', __( 'Sorry, you are not allowed to delete the property value.', 'papi-rest-api' ), ['status' => rest_authorization_required_code()] );
-		}
-
-		return true;
 	}
 
 	/**
@@ -330,11 +336,9 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 
 			$property = $page->get_property( $property['slug'] );
 
-			if ( ! papi_is_property( $property ) ) {
-				return new WP_Error( 'papi_property_slug_invalid', __( 'Property slug doesn\'t exist.', 'papi-rest-api' ) , ['status' => 404] );
+			if ( papi_is_property( $property ) ) {
+				$capabilities = array_merge( $capabilities, $property->capabilities );
 			}
-
-			$capabilities = array_merge( $capabilities, $property->capabilities );
 		}
 
 		return array_unique( $capabilities );
