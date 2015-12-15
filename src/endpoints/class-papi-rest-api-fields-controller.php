@@ -119,7 +119,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Delete a properties value on a post.
+	 * Delete properties value on a post.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -163,7 +163,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Get page type property from a field slug.
+	 * Get page type property from a property slug.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -174,7 +174,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Get page types properties.
+	 * Get properties from a post.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -367,7 +367,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Update field value on a post.
+	 * Update property value on a post.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -382,7 +382,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Update fields on a post.
+	 * Update property values on a post.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
@@ -409,7 +409,7 @@ class Papi_REST_API_Fields_Controller extends Papi_REST_API_Controller {
 	}
 
 	/**
-	 * Check if a given request has access to update a field value.
+	 * Check if a given request has access to update a property value.
 	 *
 	 * @param  WP_REST_Request $request
 	 *
