@@ -25,6 +25,10 @@ class Papi_REST_API_Additional_Fields {
 	 * Setup REST API fields.
 	 */
 	public function setup_fields() {
+		if ( ! function_exists( 'register_api_field' ) ) {
+			return;
+		}
+
 		$post_types = papi_get_post_types();
 
 		foreach ( $post_types as $post_type ) {
