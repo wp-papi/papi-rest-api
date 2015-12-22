@@ -49,16 +49,14 @@ class Papi_REST_API_Additional_Fields {
 	 */
 	public function get_fields( array $data, $field_name, WP_REST_Request $request ) {
 		$page   = papi_get_page( $data['ID'] );
-		$boxes  = papi_get_slugs( $data['ID'] );
+		$list   = papi_get_slugs( $data['ID'], true );
 		$fields = [];
 
-		foreach ( $boxes as $list ) {
-			foreach ( $list as $slug ) {
-				$property = $page->get_property( $slug );
+		foreach ( $list as $slug ) {
+			$property = $page->get_property( $slug );
 
-				if ( papi_is_property( $property ) && $property->current_user_can() ) {
-					$fields[$slug] = papi_get_field( $data['ID'], $slug );
-				}
+			if ( papi_is_property( $property ) && $property->current_user_can() ) {
+				$fields[$slug] = papi_get_field( $data['ID'], $slug );
 			}
 		}
 
