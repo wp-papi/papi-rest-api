@@ -94,6 +94,7 @@ class Papi_REST_API {
 	 */
 	public function require_files() {
 		require_once __DIR__ . '/functions.php';
+		require_once __DIR__ . '/class-papi-rest-api-additional-fields.php';
 	}
 
 	/**
