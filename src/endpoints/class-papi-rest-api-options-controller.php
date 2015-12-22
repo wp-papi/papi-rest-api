@@ -154,7 +154,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	public function get_options( WP_REST_Request $request ) {
 		$filters      = $this->get_filters( $request );
 		$properties   = [];
-		$option_types = papi_get_all_content_types( [
+		$option_types = papi_get_all_entry_types( [
 			'types' => 'option'
 		] );
 
@@ -190,7 +190,7 @@ class Papi_REST_API_Options_Controller extends Papi_REST_API_Controller {
 	 */
 	protected function get_option_types_capabilities() {
 		$capabilities = [];
-		$option_types = papi_get_all_content_types( [
+		$option_types = papi_get_all_entry_types( [
 			'type' => 'option'
 		] );
 
