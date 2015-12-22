@@ -90,8 +90,10 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 
 	public function test_delete_field_value_access_denied() {
 		$post_id = $this->factory->post->create();
-		add_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
-		add_post_meta( $post_id, 'name', 'Fredrik' );
+		update_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
+		update_post_meta( $post_id, 'name', 'Fredrik' );
+
+		$this->assertSame( 'Fredrik', papi_get_field( $post_id, 'name' ) );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/papi/v1/fields/%d/name', $post_id ) );
 		$response = $this->server->dispatch( $request );
@@ -110,8 +112,10 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		wp_set_current_user( $user_id );
 
 		$post_id = $this->factory->post->create();
-		add_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
-		add_post_meta( $post_id, 'name', 'Fredrik' );
+		update_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
+		update_post_meta( $post_id, 'name', 'Fredrik' );
+
+		$this->assertSame( 'Fredrik', papi_get_field( $post_id, 'name' ) );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/papi/v1/fields/%d/name_missing', $post_id ) );
 		$response = $this->server->dispatch( $request );
@@ -131,8 +135,10 @@ class Papi_REST_API_Fields_Controller_Test extends WP_Test_REST_TestCase {
 		wp_set_current_user( $user_id );
 
 		$post_id = $this->factory->post->create();
-		add_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
-		add_post_meta( $post_id, 'name', 'Fredrik' );
+		update_post_meta( $post_id, papi_get_page_type_key(), 'simple-content-page-type' );
+		update_post_meta( $post_id, 'name', 'Fredrik' );
+
+		$this->assertSame( 'Fredrik', papi_get_field( $post_id, 'name' ) );
 
 		$request = new WP_REST_Request( 'DELETE', sprintf( '/papi/v1/fields/%d/name', $post_id ) );
 		$response = $this->server->dispatch( $request );
