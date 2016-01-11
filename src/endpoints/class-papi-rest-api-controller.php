@@ -79,8 +79,10 @@ abstract class Papi_REST_API_Controller {
 		 * Modify the property item that is returned to the REST API.
 		 *
 		 * @param  array $item
+		 *
+		 * @return mixed
 		 */
-		if ( $output = apply_filters( 'papi/rest/property_item', $item ) ) {
+		if ( $output = apply_filters( 'papi/rest/prepare_property_item', $item ) ) {
 			$item = is_array( $output ) || is_object( $output ) ? (array) $output : $item;
 		}
 
