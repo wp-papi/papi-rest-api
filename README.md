@@ -8,6 +8,8 @@ Add-on for the WordPress REST API, requires Papi 3.0.0.
 
 ## Addtional fields
 
+### Fields
+
 Post types that has page types will get addtional field attached to the object with the `fields` that contains all fields for the the current post page type. This can be removed.
 
 Example response with additional `fields` field:
@@ -19,6 +21,17 @@ Example response with additional `fields` field:
     "fields": {
       "name": "Fredrik"
     }
+  }
+]
+```
+
+### Page type field
+
+```json
+[
+  {
+    "id": 1,
+    "page_type": "example-page-type"
   }
 ]
 ```

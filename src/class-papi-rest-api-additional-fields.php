@@ -33,7 +33,11 @@ class Papi_REST_API_Additional_Fields {
 
 		foreach ( $post_types as $post_type ) {
 			register_api_field( $post_type, 'fields', [
-				'get_callback'    => [$this, 'get_fields']
+				'get_callback' => [$this, 'get_fields']
+			] );
+
+			register_api_field( $post_type, 'page_type', [
+				'get_callback' => [$this, 'get_page_type']
 			] );
 		}
 	}
@@ -61,6 +65,19 @@ class Papi_REST_API_Additional_Fields {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Get page type.
+	 *
+	 * @param  array           $data
+	 * @param  string          $field_name
+	 * @param  WP_REST_Request $request
+	 *
+	 * @return array
+	 */
+	public function get_page_type( array $data, $field_name, WP_REST_Request $request ) {
+		return papi_get_page_type_id( $data['ID'] ) ?: '';
 	}
 }
 
