@@ -146,7 +146,7 @@ Delete a single option type property value.
 
 ## Filters
 
-`papi/rest/property_item` - Modify the property item that is returned to the REST API.
+`papi/rest/prepare_property_item` - Modify the property item that is returned to the REST API.
 
 # License
 
