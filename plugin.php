@@ -4,7 +4,7 @@
  * Plugin Name: Papi REST API
  * Description: Add-on for the WordPress REST API
  * Author: Fredrik Forsmo
- * Author URI: http://forsmo.me
+ * Author URI: https://frozzare.com
  * Version: 1.0.0
  * Plugin URI: https://github.com/wp-papi/papi-rest-api
  * Textdomain: papi-rest-api
