@@ -148,6 +148,6 @@ Delete a single option type property value.
 
 `papi/rest/prepare_property_item` - Modify the property item that is returned to the REST API.
 
-# License
+## License
 
 MIT © [Fredrik Forsmo](https://github.com/frozzare)
