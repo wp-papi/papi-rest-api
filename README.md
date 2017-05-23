@@ -1,6 +1,6 @@
 # Papi REST API
 
-> Work in progress
+> Deprecated with Papi 3.2.0+
 
 [![Build Status](https://travis-ci.org/wp-papi/papi-rest-api.svg?branch=master)](https://travis-ci.org/wp-papi/papi-rest-api)
 
